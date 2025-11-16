@@ -8,10 +8,8 @@ import (
 	"strings"
 )
 
-// exists checks if a path exists.
 func exists(p string) bool { _, err := os.Stat(p); return err == nil }
 
-// safeUnder ensures p is under base (prevents path traversal).
 func safeUnder(base, p string) bool {
 	absBase, _ := filepath.Abs(base)
 	absP, _ := filepath.Abs(p)
@@ -63,10 +61,9 @@ func HumanizeBytes(b int64) string {
 	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
 }
 
-// rsyncCopy copies src -> dst and returns rsync stats (shortened later for UI).
 func rsyncCopy(src, dst string) (string, error) {
 	if !exists(src) {
-		return "", nil // ok: nothing to copy
+		return "", nil
 	}
 	if err := os.MkdirAll(dst, 0o755); err != nil {
 		return "", err
@@ -76,7 +73,6 @@ func rsyncCopy(src, dst string) (string, error) {
 	return strings.TrimSpace(string(out)), err
 }
 
-// shortStats picks useful lines from rsync --info=stats2 output.
 func shortStats(s string) string {
 	lines := []string{}
 	for _, ln := range strings.Split(s, "\n") {

@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-// detectSteamDir finds the Steam folder.
 func detectSteamDir() string {
 	h, _ := os.UserHomeDir()
 	cands := []string{
@@ -25,7 +24,6 @@ func detectSteamDir() string {
 	return cands[0]
 }
 
-// resolveRepoAppID fuzzy-matches "repo" in manifests, falls back to known 3241660.
 func resolveRepoAppID(steamDir string) string {
 	if id, ok := findAppIDFuzzy(steamDir, "repo"); ok {
 		return id
@@ -64,7 +62,6 @@ func findAppIDFuzzy(steamDir, want string) (string, bool) {
 	return "", false
 }
 
-// findSteamID returns the numeric SteamID that has userdata/<steamid>/<appid>
 func findSteamID(steamDir, appid string) (string, error) {
 	userDir := filepath.Join(steamDir, "userdata")
 	ents, err := os.ReadDir(userDir)
@@ -82,7 +79,6 @@ func findSteamID(steamDir, appid string) (string, error) {
 	return "", os.ErrNotExist
 }
 
-// findAnySteamID returns the first numeric folder under userdata (fallback).
 func findAnySteamID(steamDir string) (string, error) {
 	userDir := filepath.Join(steamDir, "userdata")
 	ents, err := os.ReadDir(userDir)
@@ -98,7 +94,6 @@ func findAnySteamID(steamDir string) (string, error) {
 	return "", os.ErrNotExist
 }
 
-// steamShutdown tries to stop Steam so it doesn't rewrite files during copy.
 func steamShutdown() {
 	if p, err := exec.LookPath("steam"); err == nil {
 		_ = exec.Command(p, "-shutdown").Start()

@@ -10,16 +10,14 @@ import (
 	"time"
 )
 
-// What we render on the left list.
 type BackupEntry struct {
-	Name      string // REPO-YYYYMMDD-HHMM
-	Path      string // absolute
-	Rel       string // "~/<path>"
+	Name      string
+	Path      string
+	Rel       string
 	SizeBytes int64
 	SizeHuman string
 }
 
-// Details pane on the right.
 type BackupDetail struct {
 	Name      string
 	Path      string
@@ -27,13 +25,11 @@ type BackupDetail struct {
 	SizeHuman string
 }
 
-// BackupsBase => ~/Backups
 func BackupsBase() string {
 	h, _ := os.UserHomeDir()
 	return filepath.Join(h, "Backups")
 }
 
-// ListBackups returns newest-first list of backups with the given prefix.
 func ListBackups(prefix string) []BackupEntry {
 	base := BackupsBase()
 	ents, _ := os.ReadDir(base)
@@ -55,7 +51,6 @@ func ListBackups(prefix string) []BackupEntry {
 	return out
 }
 
-// DescribeBackup fills detail for selected entry.
 func DescribeBackup(base, name string) (BackupDetail, error) {
 	path := filepath.Join(base, name)
 	appid, _ := firstChildDir(filepath.Join(path, "compatdata"))
@@ -78,7 +73,6 @@ func CreateBackup(label string) (string, string, error) {
 		}
 	}
 
-	// Stop Steam briefly to avoid racey writes
 	steamShutdown()
 
 	stamp := time.Now().Format("20060102-1504")
@@ -102,7 +96,6 @@ func CreateBackup(label string) (string, string, error) {
 		pieces = append(pieces, "userdata: "+shortStats(s))
 	}
 
-	// Also capture the Unity LocalLow save folder into dest/saves/Repo (so restore is reliable)
 	saveSrc := findRepoSaveInPrefix(compSrc)
 	if saveSrc != "" {
 		saveDst := filepath.Join(dest, "saves", "Repo")
@@ -118,7 +111,6 @@ func CreateBackup(label string) (string, string, error) {
 	return name, strings.Join(pieces, " | "), nil
 }
 
-// RestoreBackup replaces live folders with backup content, returning copy stats.
 func RestoreBackup(name string) (string, error) {
 	base := BackupsBase()
 	path := filepath.Join(base, name)

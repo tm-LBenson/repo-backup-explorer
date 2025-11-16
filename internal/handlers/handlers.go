@@ -50,8 +50,6 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// ---------- actions ----------
-
 func postBackup(w http.ResponseWriter, r *http.Request) {
 	name, summary, err := core.CreateBackup(gameLabel)
 	if err != nil {
