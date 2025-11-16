@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{.Game}} backups</title>
+<style>
+  :root { --bg:#0b1020; --panel:#121938; --line:#1c2652; --txt:#e6e9ef; --mut:#9aa3b2; --btn:#3b82f6; --danger:#ef4444; }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
+  header{padding:14px 18px;border-bottom:1px solid #1b2340;background:#11162a;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+  main{display:grid;grid-template-columns:300px 1fr;gap:14px;max-width:1200px;margin:0 auto;padding:16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .list{padding:10px;display:flex;flex-direction:column;gap:8px;max-height:76vh;overflow:auto}
+  .item{padding:10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;text-decoration:none;color:inherit}
+  .item.active{border-color:var(--btn);background:#0f1530}
+  code{background:#0f1530;padding:2px 6px;border-radius:6px}
+  .right{padding:16px}
+  .row{display:flex;gap:10px;align-items:center;margin:6px 0}
+  button{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:9px 14px;cursor:pointer}
+  .danger{background:var(--danger)}
+  .ghost{background:#334155}
+  .muted{color:var(--mut)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .status{padding:10px 16px}
+  .ok{background:rgba(16,185,129,.15);border-bottom:1px solid rgba(16,185,129,.35)}
+  .err{background:rgba(239,68,68,.15);border-bottom:1px solid rgba(239,68,68,.35)}
+</style>
+</head>
+<body>
+<header>
+  <div>{{.Game}} backups</div>
+  <form method="post" action="/backup"><button type="submit">Back up now</button></form>
+</header>
+
+{{if .Status}}<div class="status ok">{{.Status}}</div>{{end}}
+{{if .Error}} <div class="status err">{{.Error}}</div>{{end}}
+
+<main>
+  <section class="panel">
+    <div class="list">
+      {{if .Entries}}
+        {{range .Entries}}
+          <a class="item {{if eq .Name $.SelName}}active{{end}}" href="/?sel={{.Name}}">
+            <div><strong>{{.Name}}</strong></div>
+            <div class="muted"><code>{{.Rel}}</code></div>
+          </a>
+        {{end}}
+      {{else}}
+        <div class="muted" style="padding:10px">No backups yet.</div>
+      {{end}}
+    </div>
+  </section>
+
+  <section class="panel right">
+    {{if .Sel}}
+      <h3 style="margin:0 0 10px 0">{{.Sel.Name}}</h3>
+      <div class="row"><div class="muted">Folder:</div><code>{{.Sel.Path}}</code></div>
+      <div class="row"><div class="muted">AppID:</div><code>{{.Sel.AppID}}</code></div>
+      <div class="row"><div class="muted">Size:</div><code>{{.Sel.SizeHuman}}</code></div>
+      <div class="actions" style="margin-top:12px">
+        <form method="post" action="/restore">
+          <input type="hidden" name="name" value="{{.Sel.Name}}">
+          <button type="submit">Restore</button>
+        </form>
+        <form method="post" action="/open">
+          <input type="hidden" name="name" value="{{.Sel.Name}}">
+          <button class="ghost" type="submit">Open folder</button>
+        </form>
+        <form method="post" action="/delete" onsubmit="return confirm('Delete this backup?')">
+          <input type="hidden" name="name" value="{{.Sel.Name}}">
+          <button class="danger" type="submit">Delete</button>
+        </form>
+      </div>
+    {{else}}
+      <div class="muted">Select a backup on the left.</div>
+    {{end}}
+  </section>
+</main>
+</body>
+</html>
